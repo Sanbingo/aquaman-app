@@ -1,4 +1,5 @@
 import Taro, { Component, Config } from '@tarojs/taro'
+import 'taro-ui/dist/style/index.scss'
 import Index from './pages/index'
 
 import './app.less'
