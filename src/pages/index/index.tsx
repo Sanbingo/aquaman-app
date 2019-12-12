@@ -28,7 +28,8 @@ export default class Index extends Component {
       per_page: 20
     }
   }
-  handleClick (value) {
+  handleClick = (value) => {
+    console.log('value', value)
     this.setState({
       current: value
     })
@@ -90,6 +91,9 @@ export default class Index extends Component {
       </Swiper>
     )
   }
+  handleArticleClick(item){
+    console.log('click', item.id)
+  }
   renderList() {
     const imgReg = /<img.*?(?:>|\/>)/gi
     const srcReg = /src=[\'\"]?([^\'\"]*)[\'\"]?/i
@@ -98,7 +102,7 @@ export default class Index extends Component {
       // 从content中提取第一张图片为缩略图
       const arr = item.content.rendered.match(imgReg);
       const src = arr && arr[0] && arr[0].match(srcReg);
-      return <List key={item.id} thumb={src && src[1]} title={item.title.rendered} time={item.modified} />
+      return <List key={item.id} postId={item.id} thumb={src && src[1]} title={item.title.rendered} time={item.modified} />
     })
   }
   rednerBottomLine() {
@@ -119,11 +123,11 @@ export default class Index extends Component {
         <AtTabBar
         fixed
         tabList={[
-          { title: '待办事项', iconType: 'bullet-list', text: 'new' },
-          { title: '拍照', iconType: 'camera' },
-          { title: '文件夹', iconType: 'folder', text: '100', max: '99' }
+          { title: '首页', iconType: 'home' },
+          { title: '搜索', iconType: 'search' },
+          { title: '我的', iconType: 'user' }
         ]}
-        onClick={this.handleClick.bind(this)}
+        onClick={this.handleClick}
         current={this.state.current}
       />
       </View>
