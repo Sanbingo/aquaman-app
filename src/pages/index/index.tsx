@@ -1,4 +1,4 @@
-import Taro, { Component, Config, useReachBottom} from '@tarojs/taro'
+import Taro, { Component, Config} from '@tarojs/taro'
 import { View, Image, Swiper, SwiperItem } from '@tarojs/components'
 import { AtTabBar, AtDivider } from 'taro-ui'
 import List from './components/list'
@@ -27,12 +27,6 @@ export default class Index extends Component {
       page: 1,
       per_page: 20
     }
-  }
-  handleClick = (value) => {
-    console.log('value', value)
-    this.setState({
-      current: value
-    })
   }
   getPosts() {
     Taro.request({
@@ -67,11 +61,9 @@ export default class Index extends Component {
     } 
     this.getPosts()
   }
-
   renderSwiper() {
     return (
       <Swiper
-        className='test-h'
         indicatorColor='#999'
         indicatorActiveColor='#333'
         circular
@@ -90,9 +82,6 @@ export default class Index extends Component {
         </SwiperItem>
       </Swiper>
     )
-  }
-  handleArticleClick(item){
-    console.log('click', item.id)
   }
   renderList() {
     const imgReg = /<img.*?(?:>|\/>)/gi
@@ -120,16 +109,6 @@ export default class Index extends Component {
           {this.renderList()}
           {this.rednerBottomLine()}
         </View>
-        <AtTabBar
-        fixed
-        tabList={[
-          { title: '首页', iconType: 'home' },
-          { title: '搜索', iconType: 'search' },
-          { title: '我的', iconType: 'user' }
-        ]}
-        onClick={this.handleClick}
-        current={this.state.current}
-      />
       </View>
     )
   }

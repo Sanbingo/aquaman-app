@@ -22,6 +22,7 @@ class App extends Component {
   config: Config = {
     pages: [
       'pages/index/index',
+      'pages/search/index',
       'pages/article/index'
     ],
     window: {
@@ -29,7 +30,26 @@ class App extends Component {
       navigationBarBackgroundColor: '#fff',
       navigationBarTitleText: 'WeChat',
       navigationBarTextStyle: 'black'
-    }
+    },
+    tabBar: {
+      "color": "#777777",
+      "selectedColor": "#ff6633",
+      "backgroundColor": "#fff",
+      "list": [
+        {
+          "pagePath": "pages/index/index",
+          "text": "首页"
+        },
+        {
+          "pagePath": "pages/search/index",
+          "text": "搜索"
+        },
+        {
+          "pagePath": "pages/index/index",
+          "text": "我的"
+        }
+      ]
+    },
   }
 
   componentDidMount () {}

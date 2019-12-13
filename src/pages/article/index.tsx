@@ -1,5 +1,5 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, RichText, Image } from '@tarojs/components'
+import { View, RichText } from '@tarojs/components'
 
 
 export default class Article extends Component {
@@ -26,7 +26,7 @@ export default class Article extends Component {
             content: res && res.data && res.data.content.rendered,
         })
         this.isFetching = false
-        Taro.hideToast()
+        Taro.hideLoading()
         })
     }
 
@@ -37,9 +37,7 @@ export default class Article extends Component {
 
     fetchData (id) {
         this.isFetching = true
-        Taro.showToast({
-            title: 'load...'
-        })
+        Taro.showLoading()
         return Taro.request({
             url: `http://47.110.230.32/wp-json/wp/v2/posts/${id}`, 
           })
