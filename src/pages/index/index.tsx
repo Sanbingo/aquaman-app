@@ -1,6 +1,6 @@
 import Taro, { Component, Config} from '@tarojs/taro'
-import { View, Image, Swiper, SwiperItem } from '@tarojs/components'
-import { AtTabBar, AtDivider } from 'taro-ui'
+import { View, Image, Swiper, SwiperItem, Text, ScrollView } from '@tarojs/components'
+import { AtDivider } from 'taro-ui'
 import List from './components/list'
 import './index.less'
 
@@ -25,7 +25,8 @@ export default class Index extends Component {
       current: 0,
       list: [],
       page: 1,
-      per_page: 20
+      per_page: 20,
+      tabsIdx: 0
     }
   }
   getPosts() {
@@ -61,6 +62,23 @@ export default class Index extends Component {
     } 
     this.getPosts()
   }
+  handleTabsClick = idx => () => {
+    this.setState({
+      tabsIdx: idx
+    })
+  }
+  renderTabs() {
+    const tabList = [{ title: '科技' }, { title: '游戏' }, { title: '互联网' }, { title: '手机' }, { title: '汽车' }, { title: '人工智能' }, { title: '半导体' }, { title: '财经' }]
+    const { tabsIdx } = this.state
+    return (
+      <ScrollView className="tabs-container" scrollX>
+        {tabList.map((item, index) => <Text
+        className={ index === tabsIdx ? 'tabs-container__item checked' : 'tabs-container__item'}
+        onClick={this.handleTabsClick(index)}
+        >{item.title}</Text>)}
+      </ScrollView>
+    )
+  }
   renderSwiper() {
     return (
       <Swiper
@@ -87,11 +105,14 @@ export default class Index extends Component {
     const imgReg = /<img.*?(?:>|\/>)/gi
     const srcReg = /src=[\'\"]?([^\'\"]*)[\'\"]?/i
 
-    return this.state.list.map(item => {
+    return this.state.list.map((item, index) => {
       // 从content中提取第一张图片为缩略图
       const arr = item.content.rendered.match(imgReg);
       const src = arr && arr[0] && arr[0].match(srcReg);
-      return <List key={item.id} postId={item.id} thumb={src && src[1]} title={item.title.rendered} time={item.modified} />
+      if (arr && arr.length > 2) {
+        console.log('arr', index, arr)
+      }
+      return <List multipleShow={arr && arr.length > 2} key={item.id} postId={item.id} thumb={src && src[1]} title={item.title.rendered} time={item.modified} />
     })
   }
   rednerBottomLine() {
@@ -105,6 +126,7 @@ export default class Index extends Component {
     return (
       <View className='index'>
         <View className='lists-container'>
+          {this.renderTabs()}
           {this.renderSwiper()}
           {this.renderList()}
           {this.rednerBottomLine()}
