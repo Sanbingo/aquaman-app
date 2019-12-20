@@ -33,20 +33,20 @@ class App extends Component {
     },
     tabBar: {
       "color": "#777777",
-      "selectedColor": "#ff6633",
+      "selectedColor": "#sfe699",
       "backgroundColor": "#fff",
       "list": [
         {
           "pagePath": "pages/index/index",
-          "text": "首页"
+          "text": "首页",
+          "iconPath": "images/icons/icon_home.png",
+          "selectedIconPath": "images/icons/icon_home_selected.png"
         },
         {
           "pagePath": "pages/search/index",
-          "text": "搜索"
-        },
-        {
-          "pagePath": "pages/index/index",
-          "text": "我的"
+          "text": "搜索",
+          "iconPath": "images/icons/icon_search.png",
+          "selectedIconPath": "images/icons/icon_search_selected.png"
         }
       ]
     },

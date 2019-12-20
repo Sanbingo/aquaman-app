@@ -46,18 +46,19 @@ export default class Search extends Component {
         if (!value || isEnd) {
             return
         }
-        Taro.showLoading({
-            title: '加载中'
+        Taro.showToast({
+            icon: 'none',
+            title: 'loading...'
         })
         Taro.request({
-            url: 'http://www.8hnews.com/wp-json/wp/v2/search',
+            url: 'https://www.8hnews.com/wp-json/wp/v2/search',
             data: {
                 search: value,
                 page,
                 per_page,
             }
         }).then(res => {
-            Taro.hideLoading()
+            Taro.hideToast()
             this.setState({
                 list: firstTime ? res.data : [...list, ...res.data],
                 page: page + 1,

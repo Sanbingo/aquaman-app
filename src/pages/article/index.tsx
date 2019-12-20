@@ -1,6 +1,6 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, RichText } from '@tarojs/components'
-
+import WxParse from './components/wxParse/wxParse'
 
 export default class Article extends Component {
     config: Config = {
@@ -16,14 +16,16 @@ export default class Article extends Component {
         }
       }
     componentWillMount () {
-    console.log('isFetching: ', this.isFetching)
     this.$preloadData
         .then(res => {
-        console.log('res: ', res)
+        // 图片预处理
+        const content = res && res.data && res.data.content.rendered;
+        const article = res && res.data && res.data.content.rendered
+        WxParse.wxParse('article', 'html', article, this.$scope, 5)
         this.setState({
             title: res && res.data && res.data.title.rendered,
             time: res && res.data && res.data.modified,
-            content: res && res.data && res.data.content.rendered,
+            content: content,
         })
         this.isFetching = false
         Taro.hideLoading()
@@ -31,7 +33,6 @@ export default class Article extends Component {
     }
 
     componentWillPreload (params) {
-        console.log('params', params)
         return this.fetchData(params.id)
     }
 
@@ -39,7 +40,7 @@ export default class Article extends Component {
         this.isFetching = true
         Taro.showLoading()
         return Taro.request({
-            url: `http://47.110.230.32/wp-json/wp/v2/posts/${id}`, 
+            url: `https://www.8hnews.com/wp-json/wp/v2/posts/${id}`, 
           })
     }
     render() {
@@ -54,7 +55,8 @@ export default class Article extends Component {
                 <View className='at-article__content'>
                     <View className='at-article__section'>
                         <View className='at-article__p'>
-                            <RichText nodes={this.state.content} />
+                            <import src='./components/wxParse/wxParse.wxml' />
+                            <template is='wxParse' data='{{wxParseData:article.nodes}}'/>   
                         </View>
                     </View>
                 </View>

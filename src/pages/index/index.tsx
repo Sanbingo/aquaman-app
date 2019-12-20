@@ -16,7 +16,7 @@ export default class Index extends Component {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Config = {
-    navigationBarTitleText: '首页',
+    navigationBarTitleText: '8小时资讯',
     onReachBottomDistance: 350,
   }
   constructor () {
@@ -24,27 +24,62 @@ export default class Index extends Component {
     this.state = {
       current: 0,
       list: [],
+      categories: [{
+        id: 9999,
+        name: '首页'
+      }],
+      sp: [],
       page: 1,
       per_page: 20,
-      tabsIdx: 0
+      tabsIdx: 9999
     }
   }
   getPosts() {
+    const { page, per_page, tabsIdx, list} = this.state
+    const postData = {
+      page,
+      per_page
+    }
+    if (tabsIdx !== 9999) {
+      postData.categories = tabsIdx
+    }
+    Taro.showToast({
+      icon: 'none',
+      title: 'loading...'
+    })
     Taro.request({
-      url: 'http://47.110.230.32/wp-json/wp/v2/posts', 
-      data: {
-        page: this.state.page,
-        per_page: this.state.per_page
-      }
+      url: 'https://www.8hnews.com/wp-json/wp/v2/posts', 
+      data: postData
     }).then(res => {
       this.setState({
-        list: [...this.state.list, ...res.data],
-        page: this.state.page + 1
+        list: page === 1? res.data : [...list, ...res.data],
+        page: page + 1
+      })
+      Taro.hideToast()
+    })
+  }
+  getCategories() {
+    Taro.request({
+      url: 'https://www.8hnews.com/wp-json/wp/v2/categories'
+    }).then(res => {
+      this.setState({
+        categories: [...this.state.categories, ...res.data],
+      })
+    })
+  }
+  getSpecialPosts() {
+    Taro.request({
+      url: 'https://www.8hnews.com/wp-json/wp/v2/posts?author=6'
+    }).then(res => {
+      this.setState({
+        sp: res.data.slice(0, 5)
       })
     })
   }
   componentWillMount () {
     this.getPosts();
+    this.getCategories();
+    this.getSpecialPosts();
   }
 
   componentDidMount () { }
@@ -62,24 +97,50 @@ export default class Index extends Component {
     } 
     this.getPosts()
   }
-  handleTabsClick = idx => () => {
+
+  processList(list) {
+    // 收集content中图片的信息
+    const imgReg = /<img.*?(?:>|\/>)/gi
+    const srcReg = /src=[\'\"]?([^\'\"]*)[\'\"]?/i
+    return list.map((item, index) => {
+      const arr = item.content.rendered.match(imgReg) || [];
+      const srcMatch = arr && arr[0] && arr[0].match(srcReg)    
+      return ({
+        ...item,
+        includePics: arr.length > 0, // 文章是否包含图片
+        picsCount: arr.length, // 文章中图片的数量
+        firstPic: srcMatch && srcMatch[1], // 首图地址
+      })
+    })
+  }
+
+  handleTabsClick = id => () => {
     this.setState({
-      tabsIdx: idx
+      tabsIdx: id,
+      page: 1,
+      per_page: 20,
+    }, () => {
+      this.getPosts()
     })
   }
   renderTabs() {
-    const tabList = [{ title: '科技' }, { title: '游戏' }, { title: '互联网' }, { title: '手机' }, { title: '汽车' }, { title: '人工智能' }, { title: '半导体' }, { title: '财经' }]
-    const { tabsIdx } = this.state
+    const { tabsIdx, categories } = this.state
     return (
       <ScrollView className="tabs-container" scrollX>
-        {tabList.map((item, index) => <Text
-        className={ index === tabsIdx ? 'tabs-container__item checked' : 'tabs-container__item'}
-        onClick={this.handleTabsClick(index)}
-        >{item.title}</Text>)}
+        {categories.map((item, index) => <Text key={item.id}
+        className={ item.id === tabsIdx ? 'tabs-container__item checked' : 'tabs-container__item'}
+        onClick={this.handleTabsClick(item.id)}
+        >{item.name}</Text>)}
       </ScrollView>
     )
   }
+  handleClick = (id) => () => {
+    Taro.navigateTo({
+        url: `/pages/article/index?id=${id}`
+      })
+  }
   renderSwiper() {
+    const { sp } = this.state
     return (
       <Swiper
         indicatorColor='#999'
@@ -87,32 +148,21 @@ export default class Index extends Component {
         circular
         indicatorDots
         autoplay>
-        <SwiperItem>
-          <View className='demo-text-1'><Image
-          src='http://b.hiphotos.baidu.com/image/pic/item/908fa0ec08fa513db777cf78376d55fbb3fbd9b3.jpg'
-        /></View>
-        </SwiperItem>
-        <SwiperItem>
-          <View className='demo-text-2'><Image src='http://a.hiphotos.baidu.com/image/pic/item/9a504fc2d5628535bdaac29e9aef76c6a6ef63c2.jpg' /></View>
-        </SwiperItem>
-        <SwiperItem>
-          <View className='demo-text-3'><Image src='http://f.hiphotos.baidu.com/image/pic/item/b151f8198618367aa7f3cc7424738bd4b31ce525.jpg' /></View>
-        </SwiperItem>
+          {
+            this.processList(sp).filter(item => item.includePics).map(item => <SwiperItem
+              onClick={this.handleClick(item.id)}
+              key={item.id}>
+              <Image style='width: 100%'
+              src={item.firstPic}
+            />
+            </SwiperItem>)
+          }
       </Swiper>
     )
   }
-  renderList() {
-    const imgReg = /<img.*?(?:>|\/>)/gi
-    const srcReg = /src=[\'\"]?([^\'\"]*)[\'\"]?/i
-
-    return this.state.list.map((item, index) => {
-      // 从content中提取第一张图片为缩略图
-      const arr = item.content.rendered.match(imgReg);
-      const src = arr && arr[0] && arr[0].match(srcReg);
-      if (arr && arr.length > 2) {
-        console.log('arr', index, arr)
-      }
-      return <List multipleShow={arr && arr.length > 2} key={item.id} postId={item.id} thumb={src && src[1]} title={item.title.rendered} time={item.modified} />
+  renderList() { 
+    return this.processList(this.state.list).filter(item => item.includePics).map((item, index) => {
+      return <List key={item.id} postId={item.id} thumb={item.firstPic} title={item.title.rendered} time={item.modified} />
     })
   }
   rednerBottomLine() {
