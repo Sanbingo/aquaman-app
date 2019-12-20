@@ -10,7 +10,23 @@ export default class List extends Component {
             url: `/pages/article/index?id=${postId}`
           })
     }
+
     render() {
+        const { multipleMode, multiplePics=[] } = this.props;
+        // 多图模式
+        if (multipleMode) {
+            return (
+                <View className="list-wrap" onClick={this.handleClick}>
+                    <View className="list-wrap-item">
+                        <View className="list-wrap__title">{this.props.title}</View>
+                        <View className="list-wrap__images">
+                            {multiplePics.map(item => <Image className="list-wrap__images-item" src={item} />)}
+                        </View>
+                    </View>
+                </View>
+            )
+        }
+        // 单图模式
         return (
             <View className="list-wrap" onClick={this.handleClick}>
                 <View className="list-wrap__left">

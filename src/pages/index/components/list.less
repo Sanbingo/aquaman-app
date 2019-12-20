@@ -1,12 +1,16 @@
 .list-wrap {
     display: flex;
-    padding: 10px;
+    padding: 20px;
+}
+
+.list-wrap:first-of-type {
+    padding-top: 40px;
 }
 
 .list-wrap__left {
     image{
         width: 190px;
-        height: 130px;
+        height: 140px;
         border-radius: 10px;
     }
 }
@@ -26,4 +30,20 @@
 .list-wrap__timestamp {
     font-size: 24px;
     color: #ccc;
+}
+
+.list-wrap-item {
+    width: 100%;
+}
+
+.list-wrap__images {
+    display: flex;
+    justify-content: space-around;
+}
+
+.list-wrap__images-item {
+    height: 140px;
+    width: 32%;
+    display: inline-block;
+    border-radius: 10px;
 }

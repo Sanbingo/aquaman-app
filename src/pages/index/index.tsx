@@ -109,7 +109,12 @@ export default class Index extends Component {
         ...item,
         includePics: arr.length > 0, // 文章是否包含图片
         picsCount: arr.length, // 文章中图片的数量
-        firstPic: srcMatch && srcMatch[1], // 首图地址
+        firstPic: srcMatch && srcMatch[1], // 单图模式，首图地址,
+        multipleMode: arr && arr.length >4, // 单图or多图，true表示多图模式，false表示单图模式
+        multiplePics: arr && arr.length >4 && arr.slice(1, 4).map(item => {
+          const destSrc = item.match(srcReg)
+          return destSrc && destSrc[1] || ''
+        })
       })
     })
   }
@@ -143,6 +148,7 @@ export default class Index extends Component {
     const { sp } = this.state
     return (
       <Swiper
+        className="swiper-container"
         indicatorColor='#999'
         indicatorActiveColor='#333'
         circular
@@ -162,7 +168,15 @@ export default class Index extends Component {
   }
   renderList() { 
     return this.processList(this.state.list).filter(item => item.includePics).map((item, index) => {
-      return <List key={item.id} postId={item.id} thumb={item.firstPic} title={item.title.rendered} time={item.modified} />
+      return <List
+                key={item.id}
+                postId={item.id}
+                thumb={item.firstPic}
+                title={item.title.rendered}
+                time={item.modified}
+                multipleMode={item.multipleMode}
+                multiplePics={item.multiplePics}
+              />
     })
   }
   rednerBottomLine() {
